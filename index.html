@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para o Meu Amor</title>
+    
+    <!-- Google Fonts para tipografia elegante -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS para estilização responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #ff4d6d;
+            --bg-color: #1a0b1c;
+        }
+        
+        html, body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 50%, #3a0ca3 0%, var(--bg-color) 100%);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            height: 100dvh;
+            max-height: 100dvh;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Wrapper principal que ocupa toda a tela e centraliza */
+        #app-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .font-cursive { font-family: 'Dancing Script', cursive; }
+        .font-serif { font-family: 'Playfair Display', serif; }
+
+        /* Animação do Coração Pulsante */
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            14% { transform: scale(1.1); }
+            28% { transform: scale(1); }
+            42% { transform: scale(1.1); }
+            70% { transform: scale(1); }
+        }
+        .animate-heartbeat {
+            animation: heartbeat 1.5s infinite;
+        }
+
+        /* Fundo de Corações Fixo e Responsivo */
+        #hearts-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100dvh;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .floating-heart {
+            position: absolute;
+            bottom: -50px;
+            color: rgba(255, 77, 109, 0.5);
+            animation: floatUp 8s linear infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-110dvh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Efeito de revelar seções */
+        .section-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: opacity 0.8s ease-in-out;
+            z-index: -1;
+        }
+        .section-active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Efeito de Rastro de Brilhos (Sparkles) */
+        .sparkle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            animation: sparkleAnim 0.8s ease-out forwards;
+        }
+        @keyframes sparkleAnim {
+            0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0) rotate(180deg); opacity: 0; }
+        }
+
+        /* Cartões Interativos */
+        .card-container {
+            perspective: 1000px;
+        }
+        .card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        .card-container.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Partículas Explosão */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        /* Sombras e Brilhos Especiais */
+        .glow-text {
+            text-shadow: 0 0 15px rgba(255, 77, 109, 0.8);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Cards de Fotos Estilizados (Inteiras, Sem Polaroid) */
+        .photo-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            padding: 6px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.5s ease-in-out;
+            max-width: 150px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @media (min-width: 768px) {
+            .photo-card {
+                padding: 8px;
+                max-width: 230px;
+            }
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: auto;
+            max-height: 180px;
+            object-fit: contain; /* Exibe a imagem inteira sem cortes */
+            border-radius: 8px;
+        }
+
+        @media (min-width: 768px) {
+            .photo-card img {
+                max-height: 280px;
+            }
+        }
+
+        /* Fotos Flutuando na Tela Final */
+        .floating-photo-card {
+            position: absolute;
+            opacity: 0;
+            transform: scale(0.5) rotate(-15deg);
+            animation: fadeInOutPhoto 14s ease-in-out infinite;
+            pointer-events: auto;
+            z-index: 20;
+            cursor: pointer;
+            will-change: transform, opacity;
+        }
+
+        .floating-photo-card:hover {
+            animation-play-state: paused !important;
+            z-index: 40 !important;
+            transform: translate(var(--mid-x), var(--mid-y)) scale(1.08) rotate(0deg) !important;
+            border-color: rgba(255, 77, 109, 0.8) !important;
+            box-shadow: 0 15px 35px rgba(255, 77, 109, 0.4) !important;
+        }
+
+        @keyframes fadeInOutPhoto {
+            0% {
+                opacity: 0;
+                transform: translate(var(--start-x), var(--start-y)) scale(0.6) rotate(var(--rot-start));
+            }
+            15% {
+                opacity: 1;
+                transform: translate(var(--mid-x), var(--mid-y)) scale(1) rotate(var(--rot-mid));
+            }
+            85% {
+                opacity: 1;
+                transform: translate(var(--mid-x), var(--mid-y)) scale(1) rotate(var(--rot-mid));
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--end-x), var(--end-y)) scale(0.6) rotate(var(--rot-end));
+            }
+        }
+    </style>
+</head>
+<body class="relative w-full h-[100dvh] max-h-[100dvh] overflow-hidden">
+
+    <!-- Fundo de corações -->
+    <div id="hearts-bg" class="fixed inset-0 overflow-hidden pointer-events-none z-0"></div>
+
+    <!-- Wrapper principal -->
+    <div id="app-wrapper">
+
+    <!-- Controle de Áudio Flutuante -->
+    <div id="music-control" class="fixed top-4 right-4 z-50 hidden">
+        <button onclick="toggleMusic()" class="p-3 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full shadow-lg hover:scale-110 active:scale-95 transition-all focus:outline-none flex items-center justify-center">
+            <i id="music-icon" class="fa-solid fa-music text-pink-400"></i>
+        </button>
+    </div>
+
+    <!-- Player oculto do YouTube -->
+    <div id="yt-player" class="hidden"></div>
+
+    <!-- TELA 1: INÍCIO -->
+    <section id="screen-intro" class="section-active">
+        <div class="flex flex-col items-center justify-center p-4 md:p-6 text-center w-full max-w-xl mx-auto gap-6 md:gap-8">
+        <div>
+            <h2 class="text-base md:text-xl text-pink-300 font-serif tracking-widest uppercase mb-1">Para o amor da minha vida</h2>
+            <h1 class="text-3xl md:text-5xl font-cursive text-white glow-text leading-tight">
+                Feliz Dia dos Namorados!
+            </h1>
+        </div>
+        
+        <!-- Contador de Tempo Juntos -->
+        <div class="glass-panel px-4 py-3 md:py-4 rounded-2xl border border-pink-500/20 w-full max-w-sm mx-auto shadow-[0_0_15px_rgba(255,77,109,0.15)] z-30">
+            <p class="text-[9px] md:text-[10px] text-pink-300 uppercase tracking-widest font-semibold mb-2">Escrevendo nossa história há</p>
+            <div id="counter" class="font-mono font-bold text-white flex justify-center gap-1.5 md:gap-3">
+                <!-- Inserido dinamicamente via JS -->
+            </div>
+        </div>
+
+        <p class="text-sm md:text-base text-gray-300 font-light">
+            Preparei uma pequena surpresa para você...
+        </p>
+        
+        <button onclick="startSurprise()" class="group relative px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-pink-600 to-red-500 rounded-full text-white font-semibold text-base md:text-lg transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(255,77,109,0.6)] focus:outline-none">
+            <span class="flex items-center gap-3">
+                <i class="fa-solid fa-gift animate-bounce"></i>
+                Abrir Surpresa
+            </span>
+        </button>
+        </div>
+    </section>
+
+    <!-- TELA 2: CARTÕES (MOTIVOS) (MODO WIZARD) -->
+    <section id="screen-cards" class="section-hidden">
+        <div class="flex flex-col items-center justify-center p-4 md:p-6 text-center w-full max-w-md mx-auto gap-6">
+        <h2 class="text-3xl md:text-4xl font-serif mb-2 text-white glow-text">Motivos para te amar</h2>
+        <p class="text-gray-300 mb-6 font-light text-xs md:text-sm">Toque no cartão para revelar a verdade.</p>
+        
+        <!-- Container do Wizard -->
+        <div id="motivos-wizard-container" class="w-full relative min-h-[192px] flex items-center justify-center">
+            
+            <!-- Cartão 1 -->
+            <div id="motivo-passo-1" class="card-container h-48 w-full" onclick="this.classList.toggle('flipped')">
+                <div class="card-inner w-full h-full relative rounded-2xl shadow-xl">
+                    <div class="card-front absolute w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900 to-pink-900 rounded-2xl border border-pink-500/30 glass-panel">
+                        <span class="text-6xl text-pink-300/50"><i class="fa-solid fa-face-smile-wink"></i></span>
+                        <p class="absolute bottom-4 text-xs text-pink-200 font-light">Toque para ler</p>
+                    </div>
+                    <div class="card-back absolute w-full h-full flex items-center justify-center bg-white text-pink-900 rounded-2xl p-6 shadow-[0_0_15px_rgba(255,255,255,0.5)]">
+                        <p class="font-serif text-lg md:text-xl font-medium text-center">Seu sorriso é a parte favorita do meu dia.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cartão 2 (Oculto inicialmente) -->
+            <div id="motivo-passo-2" class="card-container h-48 w-full hidden" onclick="this.classList.toggle('flipped')">
+                <div class="card-inner w-full h-full relative rounded-2xl shadow-xl">
+                    <div class="card-front absolute w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900 to-pink-900 rounded-2xl border border-pink-500/30 glass-panel">
+                        <span class="text-6xl text-pink-300/50"><i class="fa-solid fa-hand-holding-heart"></i></span>
+                        <p class="absolute bottom-4 text-xs text-pink-200 font-light">Toque para ler</p>
+                    </div>
+                    <div class="card-back absolute w-full h-full flex items-center justify-center bg-white text-pink-900 rounded-2xl p-6 shadow-[0_0_15px_rgba(255,255,255,0.5)]">
+                        <p class="font-serif text-lg md:text-xl font-medium text-center">A forma como você cuida de mim e me entende.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cartão 3 (Oculto inicialmente) -->
+            <div id="motivo-passo-3" class="card-container h-48 w-full hidden" onclick="this.classList.toggle('flipped')">
+                <div class="card-inner w-full h-full relative rounded-2xl shadow-xl">
+                    <div class="card-front absolute w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900 to-pink-900 rounded-2xl border border-pink-500/30 glass-panel">
+                        <span class="text-6xl text-pink-300/50"><i class="fa-solid fa-earth-americas"></i></span>
+                        <p class="absolute bottom-4 text-xs text-pink-200 font-light">Toque para ler</p>
+                    </div>
+                    <div class="card-back absolute w-full h-full flex items-center justify-center bg-white text-pink-900 rounded-2xl p-6 shadow-[0_0_15px_rgba(255,255,255,0.5)]">
+                        <p class="font-serif text-lg md:text-xl font-medium text-center">Você faz o meu mundo ser um lugar muito melhor.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cartão 4 (Oculto inicialmente) -->
+            <div id="motivo-passo-4" class="card-container h-48 w-full hidden" onclick="this.classList.toggle('flipped')">
+                <div class="card-inner w-full h-full relative rounded-2xl shadow-xl">
+                    <div class="card-front absolute w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900 to-pink-900 rounded-2xl border border-pink-500/30 glass-panel">
+                        <span class="text-6xl text-pink-300/50"><i class="fa-solid fa-infinity"></i></span>
+                        <p class="absolute bottom-4 text-xs text-pink-200 font-light">Toque para ler</p>
+                    </div>
+                    <div class="card-back absolute w-full h-full flex items-center justify-center bg-white text-pink-900 rounded-2xl p-6 shadow-[0_0_15px_rgba(255,255,255,0.5)]">
+                        <p class="font-serif text-lg md:text-xl font-medium text-center">Porque eu não consigo imaginar meu futuro sem você.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Controles de Navegação do Wizard -->
+        <div class="flex items-center justify-between w-full mt-8 z-30 px-2">
+            <!-- Botão Voltar -->
+            <button id="wizard-prev" onclick="navigateWizard(-1)" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all text-xs md:text-sm focus:outline-none disabled:opacity-30 disabled:pointer-events-none">
+                <i class="fa-solid fa-arrow-left mr-1"></i> Voltar
+            </button>
+            
+            <!-- Indicador de Progresso (Corações) -->
+            <div id="wizard-progress" class="flex gap-1.5 text-pink-400 text-xs md:text-sm">
+                <!-- Preenchido via JS: ❤️ 🤍 🤍 🤍 -->
+            </div>
+            
+            <!-- Botão Avançar -->
+            <button id="wizard-next" onclick="navigateWizard(1)" class="px-4 py-2 bg-gradient-to-r from-pink-600 to-red-500 hover:scale-105 active:scale-95 text-white rounded-full transition-all text-xs md:text-sm font-semibold focus:outline-none">
+                Avançar <i class="fa-solid fa-arrow-right ml-1"></i>
+            </button>
+        </div>
+        </div>
+    </section>
+
+    <!-- TELA 3: CARTA FINAL E FOTOS -->
+    <section id="screen-letter" class="section-hidden">
+        <div class="flex flex-col items-center justify-center p-4 md:p-6 text-center w-full max-w-xl mx-auto relative">
+        <!-- Container de Fotos Flutuantes (Fixo cobrindo a tela inteira) -->
+        <div id="photos-container" class="fixed inset-0 pointer-events-none overflow-hidden z-20"></div>
+
+        <!-- Título da Galeria que aparecerá com fade-in -->
+        <div id="gallery-title" class="opacity-0 transition-opacity duration-1000 absolute top-6 text-center z-30">
+            <h1 class="text-2xl md:text-4xl font-cursive text-pink-300 glow-text">Nossos Momentos Felizes ❤️</h1>
+        </div>
+
+        <!-- Wrapper da carta e botão para animação de sumiço -->
+        <div id="letter-wrapper" class="transition-all duration-1000 w-full flex flex-col items-center z-30 space-y-4 md:space-y-6">
+            <div class="glass-panel p-6 md:p-10 rounded-3xl w-full relative">
+                <i class="fa-solid fa-quote-left text-3xl text-pink-500/30 absolute top-4 left-4"></i>
+                
+                <div class="min-h-[160px] md:min-h-[200px] flex items-center justify-center mt-4">
+                    <p id="typewriter-text" class="text-base md:text-xl font-serif leading-relaxed text-gray-100"></p>
+                </div>
+                
+                <i class="fa-solid fa-quote-right text-3xl text-pink-500/30 absolute bottom-4 right-4"></i>
+            </div>
+
+            <button id="btn-te-amo" onclick="handleLoveClick(event)" class="opacity-0 transition-opacity duration-1000 px-8 py-4 bg-gradient-to-r from-red-600 to-pink-500 rounded-full text-white font-bold text-lg md:text-xl animate-heartbeat shadow-[0_0_30px_rgba(255,77,109,0.8)] focus:outline-none">
+                Eu te amo! ❤️
+            </button>
+        </div>
+        </div>
+    </section>
+
+    </div><!-- /app-wrapper -->
+
+    <!-- Modal de Zoom para Visualização das Fotos -->
+    <div id="zoom-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300 pointer-events-auto" onclick="closeZoom()">
+        <div class="max-w-[90vw] max-h-[85vh] relative flex flex-col items-center" onclick="event.stopPropagation()">
+            <img id="zoom-img" src="" alt="Foto em Zoom" class="max-w-full max-h-[75vh] object-contain rounded-xl shadow-2xl border border-white/20">
+            <button onclick="closeZoom()" class="absolute -top-12 right-0 text-white text-3xl hover:scale-110 active:scale-95 transition-all focus:outline-none">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- Lista de fotos do casal fornecidas na pasta ---
+        const couplePhotos = [
+            { src: 'momentofeliz.jpg' },
+            { src: '20250606_163518.jpg' },
+            { src: 'melhorcompania.jpg' },
+            { src: 'brilhoespetacular.jpg' },
+            { src: 'IMG-20221027-WA0019.jpg' },
+            { src: 'IMG-20221103-WA0090.jpg' },
+            { src: 'IMG-20221111-WA0045.jpg' },
+            { src: 'IMG-20230612-WA0051.jpg' },
+            { src: 'IMG-20231002-WA0164.jpg' },
+            { src: 'IMG-20250726-WA0032.jpg' }
+        ];
+
+        // --- API do YouTube para Trilha Sonora ---
+        let ytPlayer;
+        let isMusicPlaying = false;
+
+        // Carrega o script da API do YouTube de forma assíncrona
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        // Esta função roda automaticamente quando a API do YouTube carrega
+        function onYouTubeIframeAPIReady() {
+            ytPlayer = new YT.Player('yt-player', {
+                height: '0',
+                width: '0',
+                videoId: 'uz-SNYXzmYU',
+                playerVars: {
+                    'autoplay': 0,
+                    'controls': 0,
+                    'loop': 1,
+                    'playlist': 'uz-SNYXzmYU',
+                    'rel': 0,
+                    'showinfo': 0,
+                    'modestbranding': 1
+                },
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            ytPlayer.setVolume(45); // Define o volume inicial confortável
+        }
+
+        function startSurprise() {
+            goToScreen('screen-cards');
+            updateWizardUI(); // Inicializa o Wizard de Motivos
+            
+            // Tenta reproduzir a música
+            if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
+                ytPlayer.playVideo();
+                isMusicPlaying = true;
+                document.getElementById('music-control').classList.remove('hidden');
+                document.getElementById('music-icon').classList.add('fa-spin');
+            }
+        }
+
+        function toggleMusic() {
+            const icon = document.getElementById('music-icon');
+            if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
+                if (isMusicPlaying) {
+                    ytPlayer.pauseVideo();
+                    isMusicPlaying = false;
+                    icon.classList.remove('fa-spin', 'text-pink-400');
+                    icon.classList.add('text-gray-400');
+                } else {
+                    ytPlayer.playVideo();
+                    isMusicPlaying = true;
+                    icon.classList.add('fa-spin', 'text-pink-400');
+                    icon.classList.remove('text-gray-400');
+                }
+            }
+        }
+
+        // --- 1. GERADOR DE CORAÇÕES NO FUNDO ---
+        function createBackgroundHearts() {
+            const bg = document.getElementById('hearts-bg');
+            const icons = ['fa-heart', 'fa-star', 'fa-heart']; // Mistura corações e algumas estrelas
+            
+            setInterval(() => {
+                const heart = document.createElement('i');
+                const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+                heart.classList.add('fa-solid', randomIcon, 'floating-heart');
+                
+                // Posição horizontal aleatória
+                heart.style.left = Math.random() * 100 + 'vw';
+                
+                // Tamanho aleatório
+                const size = Math.random() * 20 + 10;
+                heart.style.fontSize = size + 'px';
+                
+                // Duração da animação aleatória para criar profundidade
+                const duration = Math.random() * 5 + 5;
+                heart.style.animationDuration = duration + 's';
+                
+                bg.appendChild(heart);
+                
+                // Remove do DOM após a animação terminar para não sobrecarregar
+                setTimeout(() => {
+                    heart.remove();
+                }, duration * 1000);
+            }, 500); // Cria um novo a cada 500ms
+        }
+
+        // --- 2. NAVEGAÇÃO ENTRE TELAS ---
+        function goToScreen(screenId) {
+            // Esconde todas
+            document.querySelectorAll('section').forEach(sec => {
+                sec.classList.remove('section-active');
+                sec.classList.add('section-hidden');
+            });
+            // Mostra a escolhida
+            const target = document.getElementById(screenId);
+            target.classList.remove('section-hidden');
+            target.classList.add('section-active');
+            window.scrollTo(0, 0);
+        }
+
+        // --- 3. EFEITO DE MÁQUINA DE ESCREVER (CARTA FINAL) ---
+        const letterContent = "Meu amor, decidi fazer algo diferente para comemorar o dia de hoje. Quero te lembrar que você é a pessoa mais incrível que eu já conheci. Obrigado por cada sorriso, cada abraço e por compartilhar a vida comigo. Feliz Dia dos Namorados! Com todo o meu amor, para sempre... Além do Oreo! 🍫";
+        
+        function startLetter() {
+            goToScreen('screen-letter');
+            const textElement = document.getElementById('typewriter-text');
+            textElement.innerHTML = '';
+            let i = 0;
+            
+            // Impede cliques múltiplos na máquina de escrever
+            if(window.typewriterInterval) clearInterval(window.typewriterInterval);
+
+            window.typewriterInterval = setInterval(() => {
+                if (i < letterContent.length) {
+                    textElement.innerHTML += letterContent.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(window.typewriterInterval);
+                    // Mostra o botão final
+                    const btn = document.getElementById('btn-te-amo');
+                    btn.classList.remove('opacity-0');
+                    btn.classList.add('opacity-100');
+                }
+            }, 60); // Velocidade da digitação
+        }
+
+        // --- LÓGICA DO WIZARD DE MOTIVOS ---
+        let currentWizardStep = 1;
+        const totalWizardSteps = 4;
+
+        function updateWizardUI() {
+            // Oculta todos os cartões e mostra o atual
+            for (let s = 1; s <= totalWizardSteps; s++) {
+                const card = document.getElementById(`motivo-passo-${s}`);
+                if (card) {
+                    card.classList.remove('flipped');
+                    if (s === currentWizardStep) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                }
+            }
+
+            // Atualiza os corações do progresso (❤️ e 🤍)
+            const progressEl = document.getElementById('wizard-progress');
+            if (progressEl) {
+                let hearts = '';
+                for (let s = 1; s <= totalWizardSteps; s++) {
+                    hearts += s === currentWizardStep ? '❤️' : '🤍';
+                }
+                progressEl.innerHTML = hearts;
+            }
+
+            // Atualiza botões
+            const prevBtn = document.getElementById('wizard-prev');
+            const nextBtn = document.getElementById('wizard-next');
+
+            if (prevBtn) {
+                prevBtn.disabled = currentWizardStep === 1;
+            }
+
+            if (nextBtn) {
+                if (currentWizardStep === totalWizardSteps) {
+                    nextBtn.innerHTML = 'Ainda tem mais... <i class="fa-solid fa-arrow-right ml-1"></i>';
+                } else {
+                    nextBtn.innerHTML = 'Avançar <i class="fa-solid fa-arrow-right ml-1"></i>';
+                }
+            }
+        }
+
+        function navigateWizard(direction) {
+            if (direction === 1 && currentWizardStep === totalWizardSteps) {
+                startLetter();
+            } else {
+                currentWizardStep += direction;
+                currentWizardStep = Math.max(1, Math.min(totalWizardSteps, currentWizardStep));
+                updateWizardUI();
+            }
+        }
+
+        // --- 4. CLIQUE FINAL: EXPLOSÃO, FADE-OUT DA CARTA E INÍCIO DAS FOTOS ---
+        function handleLoveClick(e) {
+            // Executa a explosão de corações
+            explodeHearts(e);
+
+            // Esconde a carta e o botão com fade-out e escala suave
+            const letterWrapper = document.getElementById('letter-wrapper');
+            letterWrapper.style.opacity = '0';
+            letterWrapper.style.transform = 'scale(0.95)';
+            letterWrapper.style.pointerEvents = 'none';
+
+            // Faz aparecer o título da galeria
+            const galleryTitle = document.getElementById('gallery-title');
+            setTimeout(() => {
+                galleryTitle.classList.remove('opacity-0');
+                galleryTitle.classList.add('opacity-100');
+            }, 500);
+
+            // Remove do layout físico e inicia as fotos após a transição
+            setTimeout(() => {
+                letterWrapper.style.display = 'none';
+                startPhotosShow();
+            }, 1000);
+        }
+
+        function explodeHearts(e) {
+            const btn = e.currentTarget;
+            const rect = btn.getBoundingClientRect();
+            
+            // Posição central do botão
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+
+            // Cria 35 partículas
+            for (let i = 0; i < 35; i++) {
+                createParticle(x, y);
+            }
+        }
+
+        function createParticle(x, y) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            document.body.appendChild(particle);
+            
+            // Randomiza se é coração ou bolinha brilhante
+            const isHeart = Math.random() > 0.5;
+            if(isHeart) {
+                particle.innerHTML = '<i class="fa-solid fa-heart"></i>';
+                particle.style.color = '#ff4d6d';
+                particle.style.fontSize = (Math.random() * 20 + 10) + 'px';
+            } else {
+                particle.style.width = '10px';
+                particle.style.height = '10px';
+                particle.style.background = '#ffd166';
+            }
+
+            // Posição inicial
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+
+            // Destino aleatório espalhado
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = 100 + Math.random() * 150;
+            const tx = Math.cos(angle) * velocity;
+            const ty = Math.sin(angle) * velocity - 100; // Vai um pouco mais para cima devido a gravidade
+
+            // Anima usando Web Animations API
+            const animation = particle.animate([
+                { transform: `translate(-50%, -50%) scale(1)`, opacity: 1 },
+                { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(0)`, opacity: 0 }
+            ], {
+                duration: 1000 + Math.random() * 1000,
+                easing: 'cubic-bezier(0, .9, .57, 1)'
+            });
+
+            animation.onfinish = () => {
+                particle.remove();
+            };
+        }
+
+        // --- 5. EXIBIÇÃO DE FOTOS FLUTUANTES (CARDS INTEIROS SEM SOBREPOSIÇÃO) ---
+        let photoIntervals = [];
+        let lastColumn = -1;
+
+        function startPhotosShow() {
+            // Evita criar múltiplos loops se clicar mais de uma vez
+            if(photoIntervals.length > 0) return;
+            
+            let photoIndex = 0;
+            const container = document.getElementById('photos-container');
+            
+            function spawnPhoto() {
+                const photoData = couplePhotos[photoIndex];
+                
+                // Cria elemento photo-card
+                const photoCard = document.createElement('div');
+                photoCard.classList.add('photo-card', 'floating-photo-card');
+                
+                photoCard.innerHTML = `
+                    <img src="${photoData.src}" alt="Foto de casal">
+                `;
+
+                // Clique para abrir o zoom da imagem
+                photoCard.addEventListener('click', () => {
+                    openZoom(photoData.src);
+                });
+
+                // Determina tamanho do card para cálculos de margem (celular vs desktop)
+                const isMobile = window.innerWidth < 768;
+                const cardWidth = isMobile ? 150 : 230;
+                const cardHeight = isMobile ? 180 : 280;
+                
+                // --- Algoritmo de Colunas para evitar sobreposição ---
+                const numColumns = isMobile ? 2 : 4;
+                // Alterna as colunas sequencialmente para que fotos seguidas nunca usem a mesma coluna
+                const col = (lastColumn + 1) % numColumns;
+                lastColumn = col;
+
+                // Define a faixa X da coluna
+                const colWidth = window.innerWidth / numColumns;
+                const minX = col * colWidth + 15;
+                const maxX = (col + 1) * colWidth - cardWidth - 15;
+                
+                // Posições no eixo X (garante que fique restrito à sua coluna com uma pequena variação aleatória interna)
+                const startX = Math.max(minX, Math.min(maxX, minX + Math.random() * (maxX - minX)));
+                const midX = startX + (Math.random() * 40 - 20); // Pequena oscilação horizontal
+                const endX = midX + (Math.random() * 60 - 30);
+
+                // Posições no eixo Y (Surgindo de baixo e flutuando para o topo)
+                const startY = window.innerHeight + 100;
+                const midY = Math.random() * (window.innerHeight - cardHeight - 160) + 120;
+                const endY = -cardHeight - 100;
+
+                // Rotações aleatórias para dar o efeito de fotos espalhadas
+                const rotStart = (Math.random() * 20 - 10) + 'deg';
+                const rotMid = (Math.random() * 12 - 6) + 'deg';
+                const rotEnd = (Math.random() * 24 - 12) + 'deg';
+
+                // Aplica variáveis customizadas de CSS para animação
+                photoCard.style.setProperty('--start-x', startX + 'px');
+                photoCard.style.setProperty('--start-y', startY + 'px');
+                photoCard.style.setProperty('--mid-x', midX + 'px');
+                photoCard.style.setProperty('--mid-y', midY + 'px');
+                photoCard.style.setProperty('--end-x', endX + 'px');
+                photoCard.style.setProperty('--end-y', endY + 'px');
+                
+                photoCard.style.setProperty('--rot-start', rotStart);
+                photoCard.style.setProperty('--rot-mid', rotMid);
+                photoCard.style.setProperty('--rot-end', rotEnd);
+
+                container.appendChild(photoCard);
+
+                // Remove o elemento após a animação de 14 segundos terminar
+                setTimeout(() => {
+                    photoCard.remove();
+                }, 14000);
+
+                // Avança índice das fotos circularmente
+                photoIndex = (photoIndex + 1) % couplePhotos.length;
+            }
+
+            // Spawna a primeira imediatamente
+            spawnPhoto();
+            
+            // Spawna a segunda 1.2 segundos depois para dar ritmo inicial em outra coluna
+            setTimeout(spawnPhoto, 1200);
+
+            // Cria uma foto a cada 2.5 segundos de forma contínua
+            const interval = setInterval(spawnPhoto, 2500);
+            photoIntervals.push(interval);
+        }
+
+        // --- 6. ZOOM DE IMAGENS ---
+        function openZoom(src) {
+            const modal = document.getElementById('zoom-modal');
+            const img = document.getElementById('zoom-img');
+            img.src = src;
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+            }, 10);
+        }
+
+        function closeZoom() {
+            const modal = document.getElementById('zoom-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // --- 7. CONTADOR DE TEMPO JUNTOS (13/03/2019) ---
+        function updateCounter() {
+            const startDate = new Date('2019-03-13T00:00:00');
+            const now = new Date();
+            let diffMs = now - startDate;
+
+            const seconds = Math.floor((diffMs / 1000) % 60);
+            const minutes = Math.floor((diffMs / 1000 / 60) % 60);
+            const hours = Math.floor((diffMs / (1000 * 60 * 60)) % 24);
+
+            let years = now.getFullYear() - startDate.getFullYear();
+            let months = now.getMonth() - startDate.getMonth();
+            let days = now.getDate() - startDate.getDate();
+
+            if (days < 0) {
+                const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+                days += prevMonth.getDate();
+                months--;
+            }
+            if (months < 0) {
+                months += 12;
+                years--;
+            }
+
+            const counterEl = document.getElementById('counter');
+            if (counterEl) {
+                counterEl.innerHTML = `
+                    <div class="flex flex-col items-center"><span class="text-xl md:text-2xl text-pink-400 font-bold">${years}</span><span class="text-[9px] text-gray-400 font-sans uppercase tracking-wider">Anos</span></div>
+                    <span class="text-pink-500/50 mt-1">:</span>
+                    <div class="flex flex-col items-center"><span class="text-xl md:text-2xl text-pink-400 font-bold">${months}</span><span class="text-[9px] text-gray-400 font-sans uppercase tracking-wider">Meses</span></div>
+                    <span class="text-pink-500/50 mt-1">:</span>
+                    <div class="flex flex-col items-center"><span class="text-xl md:text-2xl text-pink-400 font-bold">${days}</span><span class="text-[9px] text-gray-400 font-sans uppercase tracking-wider">Dias</span></div>
+                    <span class="text-pink-500/50 mt-1">:</span>
+                    <div class="flex flex-col items-center"><span class="text-xl md:text-2xl text-pink-400 font-bold">${hours}</span><span class="text-[9px] text-gray-400 font-sans uppercase tracking-wider">Horas</span></div>
+                    <span class="text-pink-500/50 mt-1">:</span>
+                    <div class="flex flex-col items-center"><span class="text-xl md:text-2xl text-pink-400 font-bold">${minutes}</span><span class="text-[9px] text-gray-400 font-sans uppercase tracking-wider">Min</span></div>
+                    <span class="text-pink-500/50 mt-1">:</span>
+                    <div class="flex flex-col items-center"><span class="text-xl md:text-2xl text-pink-400 font-bold">${String(seconds).padStart(2, '0')}</span><span class="text-[9px] text-gray-400 font-sans uppercase tracking-wider">Seg</span></div>
+                `;
+            }
+        }
+
+        // --- 8. RASTRO DE BRILHOS (SPARKLES) ---
+        function initSparkles() {
+            let lastSpawn = 0;
+            
+            function createSparkle(e) {
+                const now = Date.now();
+                if (now - lastSpawn < 50) return; // Limita taxa para evitar lentidão
+                lastSpawn = now;
+
+                const x = e.touches ? e.touches[0].clientX : e.clientX;
+                const y = e.touches ? e.touches[0].clientY : e.clientY;
+
+                const sparkle = document.createElement('div');
+                sparkle.classList.add('sparkle');
+                
+                // Elemento visual (coração ou faísca)
+                const isHeart = Math.random() > 0.6;
+                sparkle.innerHTML = isHeart 
+                    ? '<i class="fa-solid fa-heart text-pink-400"></i>' 
+                    : '<i class="fa-solid fa-star text-yellow-300"></i>';
+                
+                sparkle.style.fontSize = (Math.random() * 8 + 6) + 'px';
+                sparkle.style.left = x + 'px';
+                sparkle.style.top = y + 'px';
+
+                // Trajetória aleatória
+                const tx = (Math.random() * 80 - 40) + 'px';
+                const ty = (Math.random() * 80 - 40) + 'px';
+                sparkle.style.setProperty('--tx', tx);
+                sparkle.style.setProperty('--ty', ty);
+
+                document.body.appendChild(sparkle);
+
+                setTimeout(() => {
+                    sparkle.remove();
+                }, 800);
+            }
+
+            window.addEventListener('mousemove', createSparkle);
+            window.addEventListener('touchmove', createSparkle);
+        }
+
+        // --- 9. INICIALIZAÇÃO ---
+        window.onload = function() {
+            createBackgroundHearts();
+            updateCounter();
+            setInterval(updateCounter, 1000);
+            initSparkles();
+        };
+    </script>
+</body>
+</html>
